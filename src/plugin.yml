@@ -1,0 +1,74 @@
+name: ServerCore
+main: me.tamilpp25.server.core
+author: tamilpp25
+version: 1.0
+depend: [CustomItems,Testboss,Citizens]
+description: Server Core plugin
+api-version: 1.13
+commands:
+  gmc:
+    description: creative mode
+  gms:
+    description: survival mode
+  gmsp:
+    description: spectator mode
+  gmadv:
+    description: adventure mode
+  count:
+    description: countdowntest
+  createSpecialItem:
+    description: usage on discord
+  settings:
+    description: Admin settings
+  players:
+    description: get player list
+  refreshmana:
+    description: refresh
+  skillpoints:
+    description: get total skill points you have
+  setpoints:
+    description: set skill point
+  resetstats:
+    description: reset overall stats
+  addexp:
+    description: add exp
+  resetxp:
+    description: reset xp
+  setstat:
+    description: set stat
+  calcrng:
+    description: nothing
+  smpclear:
+    description: clear inv
+  maintenance:
+    description: maintenance mode
+  smpmenu:
+    description: use this command to open smpmenu
+  suicide:
+    description: シャペコ / you know what it is
+    aliases: [シャペコ,die]
+  getxppot:
+    description: Admin command
+  warp:
+    description: Teleport to different worlds!
+  serversettings:
+    description: admin command
+  resetskilltree:
+    description: Contact admin incase something is wrong
+  profile:
+    description: profile viewer
+  playerlog:
+    description: get uuid dat
+  addplayerlog:
+    description: add uuid
+    aliases: [apl]
+  glory:
+    description: usage - /glory (badge/title)
+  rankingofthegods:
+    aliases: [rotg]
+    description: usage - /glory (badge/title)
+  setPresentsConfig:
+    description: set player presents data
+  deathcount:
+    description: get deathcount
+    aliases: [deaths]
