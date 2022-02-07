@@ -22,7 +22,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="spigot-1.17.1" level="project" />
     <orderEntry type="library" name="TestBoss" level="project" />
-    <orderEntry type="library" name="CustomItems" level="project" />
     <orderEntry type="library" name="Citizens-2.0.29-b2454" level="project" />
+    <orderEntry type="library" name="MainPlugin" level="project" />
   </component>
 </module>

@@ -428,7 +428,6 @@ public class WarpMenu implements Listener, CommandExecutor {
 						p.sendMessage(ChatColor.RED + "You have not been to that place before!");
 					}
 					break;
-
 			}
 		} else {
 			warpMenu(p);

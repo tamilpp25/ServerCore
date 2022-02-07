@@ -3,30 +3,28 @@ package me.tamilpp25.server;
 import gui.MenuItems;
 import gui.smpmenu;
 import me.enesmelda.CustomItems.playerstats;
-import mobs.MobItems;
+import me.tamilpp25.server.TabComplete.warpTabComplete;
+import me.tamilpp25.server.TabComplete.sendPacketTabComplete;
+import me.tamilpp25.server.TabComplete.setStatTabComplete;
+import net.minecraft.network.protocol.game.PacketPlayOutGameStateChange;
+import net.minecraft.server.network.PlayerConnection;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -34,8 +32,6 @@ import org.bukkit.scheduler.BukkitTask;
 import xp.XPItems;
 import xp.XpEvents;
 
-import javax.naming.Name;
-import javax.swing.event.MenuEvent;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -60,6 +56,10 @@ public class core extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new ProfileViewer(this), this);
 		getServer().getPluginManager().registerEvents(new ChatStarGUI(this), this);
 		getCommand("warp").setExecutor(new WarpMenu(this));
+
+		getCommand("warp").setTabCompleter(new warpTabComplete());
+		getCommand("setstat").setTabCompleter(new setStatTabComplete());
+		getCommand("sendpacket").setTabCompleter(new sendPacketTabComplete());
 
 		//new WorldCreator("world_true_end").environment(World.Environment.THE_END).createWorld();
 		//new WorldCreator("moon2").environment(World.Environment.NORMAL).createWorld();
@@ -114,7 +114,7 @@ public class core extends JavaPlugin implements Listener {
 							"\n\n" + ChatColor.GRAY + "Server is currently restarting");
 
 				}
-				getServer().dispatchCommand((CommandSender) getServer().getConsoleSender(), "restart");
+				getServer().dispatchCommand((CommandSender) getServer().getConsoleSender(), "stop");
 			}
 
 		}).runTaskLater((Plugin) this, 320L);
@@ -343,7 +343,6 @@ public class core extends JavaPlugin implements Listener {
 							stats.setPlayerCurrentElementalPower(target, Integer.parseInt(args[1]));
 							p.sendMessage(ChatColor.GREEN + "Set Current mana to " + args[1] + " for " + target.getName());
 							break;
-
 						case "STRENGTH":
 							stats.setPlayerStrength(target, Integer.parseInt(args[1]));
 							p.sendMessage(ChatColor.GREEN + "Set Strength to " + args[1] + " for " + target.getName());
@@ -359,6 +358,77 @@ public class core extends JavaPlugin implements Listener {
 						case "SKILL_POINT":
 							stats.setSkillpoints(target, Integer.parseInt(args[1]));
 							p.sendMessage(ChatColor.GREEN + "Set Skill point to " + args[1] + " for " + target.getName());
+							break;
+						case "XP":
+							stats.setXP(target, Integer.parseInt(args[1]));
+							p.sendMessage(ChatColor.GREEN + "Set XP to " + args[1] + " for " + target.getName());
+							break;
+						case "LEVEL":
+							stats.setLevel(target, Integer.parseInt(args[1]));
+							p.sendMessage(ChatColor.GREEN + "Set Level to " + args[1] + " for " + target.getName());
+							break;
+						case "CLASS_LEVEL":
+							switch(args[3].toUpperCase()){
+								case "LIGHT"->{
+									stats.setLevelLight(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set LIGHT Class Level to " + args[1] + " for " + target.getName());
+								}
+								case "DARKNESS"->{
+									stats.setLevelDarkness(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set DARKNESS Class Level to " + args[1] + " for " + target.getName());
+								}
+								case "ELECTRIC"->{
+									stats.setLevelElectric(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set ELECTRIC Class Level to " + args[1] + " for " + target.getName());
+								}
+								case "FORCE"->{
+									stats.setLevelForce(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set FORCE Class Level to " + args[1] + " for " + target.getName());
+								}
+								case "MYSTIC"->{
+									stats.setLevelMystic(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set MYSTIC Class Level to " + args[1] + " for " + target.getName());
+								}
+								case "IMPACT"->{
+									stats.setLevelLight(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set IMPACT Class Level to " + args[1] + " for " + target.getName());
+								}
+								default-> {
+									p.sendMessage(ChatColor.RED + "Usage: /setstat CLASS_LEVEL (amount) (player) (CLASS_NAME)");
+								}
+							}
+							break;
+						case "CLASS_XP":
+							switch(args[3].toUpperCase()){
+								case "LIGHT"->{
+									stats.setXpLightClass(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set LIGHT Class XP to " + args[1] + " for " + target.getName());
+								}
+								case "DARKNESS"->{
+									stats.setXpDarknessClass(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set DARKNESS Class XP to " + args[1] + " for " + target.getName());
+								}
+								case "ELECTRIC"->{
+									stats.setXpElectricClass(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set ELECTRIC Class XP to " + args[1] + " for " + target.getName());
+								}
+								case "FORCE"->{
+									stats.setXpForceClass(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set FORCE Class XP to " + args[1] + " for " + target.getName());
+								}
+								case "MYSTIC"->{
+									stats.setXpMysticClass(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set MYSTIC Class XP to " + args[1] + " for " + target.getName());
+								}
+								case "IMPACT"->{
+									stats.setXpImpactClass(target, Integer.parseInt(args[1]));
+									p.sendMessage(ChatColor.GREEN + "Set IMPACT Class XP to " + args[1] + " for " + target.getName());
+								}
+								default-> {
+									p.sendMessage(ChatColor.RED + "Usage: /setstat CLASS_XP (amount) (player) (CLASS_NAME)");
+								}
+							}
+
 							break;
 					}
 				}
@@ -443,7 +513,6 @@ public class core extends JavaPlugin implements Listener {
 				sender.sendMessage(ChatColor.RED + "You need to be ADMIN or higher to do that!");
 			}
 		}
-
 		if (cmd.getName().equalsIgnoreCase("smpclear")) {
 			Player p = (Player) sender;
 			if (p.isOp()) {
@@ -878,6 +947,61 @@ public class core extends JavaPlugin implements Listener {
 			}else{
 				OfflinePlayer op = (OfflinePlayer) p;
 				p.sendMessage(ChatColor.GRAY + "Death count: " + ChatColor.GOLD + op.getStatistic(Statistic.DEATHS));
+			}
+		}
+		if (cmd.getName().equalsIgnoreCase("sendpacket")) {
+			Player p = (Player) sender;
+			Player target = getServer().getPlayer(args[1]);
+			if (p.isOp()) {
+				if (target != null) {
+					PlayerConnection connection = ((CraftPlayer) target).getHandle().b;
+					switch (args[0].toUpperCase()) {
+						case "RAIN_START":
+							PacketPlayOutGameStateChange rainstart = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.c, 0);
+							connection.sendPacket(rainstart);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+						case "RAIN_STOP":
+							PacketPlayOutGameStateChange rainstop = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.b, 0);
+							connection.sendPacket(rainstop);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+
+						case "GUARDIAN_EFFECT":
+							PacketPlayOutGameStateChange guardian = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.k, 0);
+							connection.sendPacket(guardian);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+
+						case "DEMO":
+							PacketPlayOutGameStateChange demo = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.f, 0);
+							connection.sendPacket(demo);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+
+						case "SKY_LEVEL":
+							PacketPlayOutGameStateChange skychange = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.h, Float.parseFloat(args[2]));
+							connection.sendPacket(skychange);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+
+						case "THUNDER_LEVEL":
+							PacketPlayOutGameStateChange rainchange = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.i, Float.parseFloat(args[2]));
+							connection.sendPacket(rainchange);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+
+						case "CREDITS":
+							PacketPlayOutGameStateChange credits = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.e, 1);
+							connection.sendPacket(credits);
+							p.sendMessage(ChatColor.GREEN + "Successfully sent packet to " + args[1]);
+							break;
+					}
+				} else {
+					p.sendMessage(ChatColor.RED + "Target Not Found!");
+				}
+			} else {
+				p.sendMessage(ChatColor.RED + "You need to be ADMIN or higher to do that!");
 			}
 		}
 		return true;

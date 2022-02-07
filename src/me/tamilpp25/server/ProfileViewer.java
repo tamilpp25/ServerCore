@@ -94,6 +94,7 @@ public class ProfileViewer implements Listener {
 					stats.getSkillpoints(clicked));
 			profilelore.add(ChatColor.GRAY + "Player XP: " + net.md_5.bungee.api.ChatColor.of("#2E4FE1") +
 					stats.getXP(clicked) + "/" + xp.xpNeededForLevel(stats.getLevel(clicked)));
+			//t
 			String str;
 			switch ((str = stats.getPlayerClass(clicked)).hashCode()) {
 				case -2100942490:

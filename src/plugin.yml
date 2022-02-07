@@ -72,3 +72,5 @@ commands:
   deathcount:
     description: get deathcount
     aliases: [deaths]
+  sendpacket:
+    description: send packet data
