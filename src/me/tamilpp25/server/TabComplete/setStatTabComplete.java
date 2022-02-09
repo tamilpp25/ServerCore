@@ -29,7 +29,7 @@ public class setStatTabComplete implements TabCompleter {
 			ArrayList<String> LKSMP_class = new ArrayList<>();
 			LKSMP_class.add("LIGHT");
 			LKSMP_class.add("DARKNESS");
-			LKSMP_class.add("MYTHIC");
+			LKSMP_class.add("MYSTIC");
 			LKSMP_class.add("FORCE");
 			LKSMP_class.add("ELECTRIC");
 			LKSMP_class.add("IMPACT");
