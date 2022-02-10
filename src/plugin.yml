@@ -4,7 +4,7 @@ author: tamilpp25
 version: 1.0
 depend: [CustomItems,Testboss,Citizens]
 description: Server Core plugin
-api-version: 1.13
+api-version: 1.17
 commands:
   gmc:
     description: creative mode
