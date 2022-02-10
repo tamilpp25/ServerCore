@@ -1,5 +1,6 @@
 package me.tamilpp25.server;
 
+import me.enesmelda.CustomItems.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -7,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -14,13 +16,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class SpecialStuff implements Listener, CommandExecutor {
@@ -29,9 +32,7 @@ public class SpecialStuff implements Listener, CommandExecutor {
 		this.plugin = plugin1;
 	}
 
-
-
-	public void createCmdBlock(Player p,String from,String to){
+	private void fishoflove(Player p, String from, String to){
 		ItemStack item = new ItemStack(Material.SALMON);
 		ItemMeta meta = item.getItemMeta();
 		ArrayList<String> lore = new ArrayList<>();
@@ -51,7 +52,7 @@ public class SpecialStuff implements Listener, CommandExecutor {
 		p.getInventory().addItem(item);
 	}
 
-	public void createCreativeMind(Player p,String from,String to,int edition){
+	private void createCreativeMind(Player p,String from,String to,int edition){
 		ItemStack item = new ItemStack(Material.MAP);
 		ItemMeta meta = item.getItemMeta();
 		ArrayList<String> lore = new ArrayList<>();
@@ -72,6 +73,18 @@ public class SpecialStuff implements Listener, CommandExecutor {
 		p.getInventory().addItem(item);
 	}
 
+	private void BugHunter(Player p, String from, String to) {
+		ItemGenerator item = new ItemGenerator(Material.DIAMOND_HOE,ChatColor.LIGHT_PURPLE + "Bug Hunter",
+				List.of(Utils.color("&7This item was given to a player")
+				,Utils.color("&7who reported a game breaking bug!"),
+				Utils.color("&7What an amazing guy! &6⭐")
+				,"",Utils.color("&8To: &b" + to)
+				,Utils.color("&8From: &c[ADMIN] " + from),"",Utils.color("&d&lSPECIAL ITEM")),1,true,false);
+
+		p.getInventory().addItem(item);
+
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player p = (Player)sender;
@@ -79,10 +92,10 @@ public class SpecialStuff implements Listener, CommandExecutor {
 			if(args[0].equalsIgnoreCase("beta_tester")){
 				Player target = plugin.getServer().getPlayer(args[1]);
 				if(target!=null) {
-					createCmdBlock(target, p.getName(), args[1]);
+					fishoflove(target, p.getName(), args[1]);
 					p.sendMessage(ChatColor.GREEN + "Gave Fish of love to " + target.getName());
 					target.playSound(target.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP,1.0f,0.8f);
-					target.sendMessage(ChatColor.RED + p.getName() + ChatColor.YELLOW + " gave you a " + ChatColor.LIGHT_PURPLE + "Fish of love" + ChatColor.YELLOW + "!");
+					target.sendMessage(ChatColor.RED + p.getName() + ChatColor.YELLOW + " gave you a " + ChatColor.LIGHT_PURPLE + "Fish of love" + ChatColor.YELLOW + " Special item!");
 				}else{
 					p.sendMessage(ChatColor.RED + "CANT_FIND_PLAYER");
 				}
@@ -96,12 +109,24 @@ public class SpecialStuff implements Listener, CommandExecutor {
 				}else{
 					p.sendMessage(ChatColor.RED + "CANT_FIND_PLAYER");
 				}
+			}else if(args[0].equalsIgnoreCase("bughunter")) {
+				Player target = plugin.getServer().getPlayer(args[1]);
+				if (target != null) {
+					BugHunter(target, p.getName(), args[1]);
+					p.sendMessage(ChatColor.GREEN + "Gave Bug Hunter to " + target.getName());
+					target.playSound(target.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP,1.0f,0.8f);
+					target.sendMessage(ChatColor.RED + p.getName() + ChatColor.YELLOW + " gave you a " + ChatColor.LIGHT_PURPLE + "Bug Hunter" + ChatColor.YELLOW + " Special item!");
+				}else{
+					p.sendMessage(ChatColor.RED + "CANT_FIND_PLAYER");
+				}
 			}else{                                                 //0        1      2
 				p.sendMessage(ChatColor.RED + "/createspecialitem (type) (to) (edition)");
 			}
 		}
 		return true;
 	}
+
+
 
 
 	@EventHandler
@@ -115,10 +140,40 @@ public class SpecialStuff implements Listener, CommandExecutor {
 	}
 
 	@EventHandler
+	public void onBugHunter(InventoryClickEvent e){
+		if(e.getInventory().getType().equals(InventoryType.SMITHING)){
+			if(e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getDisplayName()
+					.equalsIgnoreCase(ChatColor.LIGHT_PURPLE + "Bug Hunter")){
+				e.setResult(Event.Result.DENY);
+			}
+		}
+	}
+
+	@EventHandler
 	public void disableRename(PrepareAnvilEvent e){
 		ItemStack item = e.getInventory().getItem(0);
 		if(item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
 			if (e.getResult()!= null && e.getResult().hasItemMeta() && !(item.getItemMeta().getDisplayName().equalsIgnoreCase(e.getResult().getItemMeta().getDisplayName()))) {
+				e.setResult(new ItemStack(Material.AIR));
+			}
+		}
+	}
+
+	@EventHandler
+	public void disableGrindstone(InventoryClickEvent e){
+		if(e.getInventory().getType().equals(InventoryType.GRINDSTONE)){
+			if(e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasDisplayName() && e.getCurrentItem().getItemMeta().getLore()
+					.contains(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "SPECIAL ITEM")){
+				e.setResult(Event.Result.DENY);
+			}
+		}
+	}
+
+	@EventHandler
+	public void disableRename(PrepareSmithingEvent e){
+		ItemStack item = e.getInventory().getItem(0);
+		if(item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
+			if(item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE + "Bug Hunter")){
 				e.setResult(new ItemStack(Material.AIR));
 			}
 		}
